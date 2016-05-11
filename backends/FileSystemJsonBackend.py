@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*- #
 
 from FileSystemBaseBackend import FileSystemBaseBackend
-import json
+from flask import json
 import os
 import errno
 
@@ -12,13 +12,6 @@ class FileSystemJsonBackend(FileSystemBaseBackend):
 
     Automatically utf-8 encodes and decodes values at the filesystem entry/exit points.
     """
-
-    def path(self, key):
-        """
-        convert key into filename and utf-8 encode the result
-        - append path to cache
-        """
-        return os.path.join(self._path, u'{0}.json'.format(key)).encode(u'utf-8')
 
     def load(self, key):
         """
@@ -69,12 +62,13 @@ class FileSystemJsonBackend(FileSystemBaseBackend):
 
         try:
 
-            # now update the cache
-            if self._keys is not None:
-                self._keys.add(key)
+            path = self.path(key)
+            dirname = os.path.dirname(path)
 
-            filename = self.path(key)
-            dirname = os.path.dirname(filename)
+            if self._keys is None:
+                self._keys = set()
+
+            self._keys.add(path)
 
             if not os.path.exists(dirname):
 
@@ -86,7 +80,7 @@ class FileSystemJsonBackend(FileSystemBaseBackend):
                     if e.errno != errno.EEXIST:
                         raise e
 
-            with open(filename, u'w') as outfile:
+            with open(path, u'w') as outfile:
                 json.dump(
                     value,
                     outfile,

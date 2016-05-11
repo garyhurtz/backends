@@ -18,6 +18,7 @@ class FileSystemBaseBackend(BaseBackend):
 
         self._keys = None
 
+        # if cachepath doesnt exist, create it
         if not os.path.exists(self._path):
             try:
                 os.makedirs(self._path)
@@ -27,27 +28,21 @@ class FileSystemBaseBackend(BaseBackend):
                 if e.errno != errno.EEXIST:
                     raise e
 
+    def __contains__(self, key):
+        return self.path(key) in self.keys()
+
     def path(self, key):
         """
-        convert key into filename and utf-8 encode the result
+        convert key into a path.
 
         Subclasses may/should override to give appropriate extension to the
         filename
         """
-        return os.path.join(self._path, key).encode(u'utf-8')
+        # normalize the key name
+        key = key.replace(os.sep, u'{0}{0}'.format(os.sep))
 
-    @staticmethod
-    def _strip_suffix(filename):
-        """
-        By default, values are cached on the filesystem as <key>, but
-        subclasses may override path() to cache values as <key>.<suffix>.
-
-        Strip the suffix if it exists, and return the key
-
-        :param key:
-        :return:
-        """
-        return filename.split(u'.')[0]
+        # return the path to the object stored under key
+        return os.path.join(self._path, key)
 
     def keys(self):
         """
@@ -59,7 +54,7 @@ class FileSystemBaseBackend(BaseBackend):
         """
 
         if self._keys is None:
-            self._keys = {self._strip_suffix(filename) for filename in os.listdir(self._path)}
+            self._keys = {f for f in os.listdir(self._path) if os.path.isfile(os.path.join(self._path, f))}
 
         return self._keys
 
@@ -67,21 +62,24 @@ class FileSystemBaseBackend(BaseBackend):
         """
         Delete the item associated with key
 
-        :param key: the key to delete
+        :param key: the path to delete
         :type key: str
         """
         assert isinstance(key, basestring), u'Key must be a string'
 
         try:
+
+            path = self.path(key)
+
             # filesystem exit point, must manually handle utf-8 encoding
-            os.remove(self.path(key))
+            os.remove(path)
 
-            # remove key from _keys, if needed
             if self._keys is not None:
-                self._keys.remove(key)
+                self._keys.remove(path)
 
-        except IOError:
+        except IOError as e:
             # item does not exist in the cache
+            print e
             return True
 
         except OSError as e:
@@ -91,6 +89,19 @@ class FileSystemBaseBackend(BaseBackend):
 
         else:
             return True
+
+    def clear(self):
+        """
+        Remove all items from the cache
+
+        :return:
+        """
+        for root, _, filenames in os.walk(self._path):
+            for f in filenames:
+                path = os.path.join(root, f)
+                os.remove(path)
+
+        self._keys = None
 
     @abc.abstractmethod
     def load(self, key):
