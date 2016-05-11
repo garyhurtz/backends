@@ -43,7 +43,7 @@ class TextCache(object):
         return len(self.backend)
 
     def __contains__(self, key):
-        return key in self.locals or key in self.backend
+        return key in self.backend
 
     def keys(self):
         return self.backend.keys()
@@ -90,8 +90,10 @@ class TextCache(object):
 
         assert isinstance(key, basestring), u'Key must be a string'
 
+        # local keys are paths
         self.locals[key] = value
 
+        # backend dumps keys into subdirectories
         self.backend.dump(key, value)
 
     def delete(self, key):
@@ -115,18 +117,14 @@ class TextCache(object):
         Delete all expired items from the cache
         :return:
         """
-        all_keys = {k for k in self.keys()}
+        expired_keys = {k for k in self.keys() if self._file_expired(k)}
 
-        for key in all_keys:
-            if self._file_expired(key):
-                self.delete(key)
+        for key in expired_keys:
+            self.delete(key)
 
     def clear(self):
         """
         Clear all items from the cache
         :return:
         """
-        all_keys = {k for k in self.keys()}
-
-        for key in all_keys:
-            self.delete(key)
+        self.backend.clear()

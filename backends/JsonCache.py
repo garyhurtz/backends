@@ -142,7 +142,4 @@ class JsonCache(object):
         Clear all items from the cache
         :return:
         """
-        all_keys = {k for k in self.keys()}
-
-        for key in all_keys:
-            self.delete(key)
+        self.backend.clear()

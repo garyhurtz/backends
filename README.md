@@ -16,11 +16,11 @@ Defines the common interface for backends. The interface is generally a subset o
 
 backends also support the *in* operator:
 
-for key in backend:
-    ...
+    for key in backend:
+        ...
     
-if key in backend:
-    ...
+    if key in backend:
+        ...
     
 ## VolatileBackend
 The VolatileBackend is a backend that stores values in memory, in a Python dictionary. Supports the common backend interface.
@@ -29,6 +29,11 @@ The VolatileBackend is a backend that stores values in memory, in a Python dicti
 FileSystemBackends handle the logistics for connecting, saving, and retrieving data to/from the local filesystem. Unicode conversions are explicitly handled to overcome encoding variations between local development servers and AWS EC2 defaults.
 
 The FileSystemBaseBackend is the superclass for FileSystem backends. This class is instantiated with the path to the cache folder, then handles key conversions as needed to load/dump values from/to the cache folder.
+
+In addition to the common interface, FileSystem Backends have a few extra methods
+
+* *backend.path(key)* - return the path to the object stored under *key*
+* *backend.clear()* - delete all items from the cache
 
 ### FileSystemTextBackend
 A backend that stores Unicode strings on the FileSystem.
@@ -48,7 +53,7 @@ In addition to the common interface, S3 Backends have a few extra methods
 * *make_public(key)* - make the object *key* public
 * *make_private(key)* - make the object *key* private
 
-AWS credentials should not be hard-coded into your code, and S3Backends support credentials as described [here](https://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs)
+AWS credentials should not be hard-coded into your code, and S3 backends support credentials as described [here](https://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs)
 
 ### S3JsonBackend
 A backend that stores Python *dicts* or *lists* in an S3 bucket, in JSON format

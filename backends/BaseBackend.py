@@ -11,7 +11,7 @@ class BaseBackend(object):
     Note: keys is the master method, other functions derived from keys
     """
 
-    # unified time format across backends
+    # unified time format
     _time_format = u'%Y-%m-%dT%H:%M:%S'
 
     @property

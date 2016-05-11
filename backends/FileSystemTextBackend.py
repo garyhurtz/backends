@@ -46,20 +46,24 @@ class FileSystemTextBackend(FileSystemBaseBackend):
 
         assert isinstance(key, basestring), u'Key must be a string'
 
+        # if value is a file, read it into a string
         if isinstance(value, file):
             value = value.read()
 
+        # if value is not already a string, convert it to unicode
         if not isinstance(value, basestring):
             value = unicode(value)
 
         try:
 
             # now update the cache
-            if self._keys is not None:
-                self._keys.add(key)
+            path = self.path(key)
+            dirname = os.path.dirname(path)
 
-            filename = self.path(key)
-            dirname = os.path.dirname(filename)
+            if self._keys is None:
+                self._keys = set()
+
+            self._keys.add(path)
 
             # create the cache directory that will hold the template, if needed
             if not os.path.exists(dirname):
@@ -72,7 +76,7 @@ class FileSystemTextBackend(FileSystemBaseBackend):
                     if e.errno != errno.EEXIST:
                         raise e
 
-            with codecs.open(filename, u'w', u'utf-8') as outfile:
+            with codecs.open(path, u'w', u'utf-8') as outfile:
                 outfile.write(value.decode(u'utf-8'))
 
         except IOError as e:
