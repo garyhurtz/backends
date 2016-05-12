@@ -1,6 +1,6 @@
 # backends
 
-General-purpose abstractions for various backends.
+This library is made up of several components:
 
 ## BaseBackend
 
@@ -67,7 +67,7 @@ If the file is javascript or css, it will be gzipped when upload to S3. Also sup
 Caches apply the FileSystem backends to provide simple FileSystem caches, which can be used (for example) in conjunction with the S3Backends to cache objects retrieved from S3 to the local FileSystem.
 
 ### JsonCache
-The JsonCache is essentially a FileSystemJsonBackend with an additional *timeout* parameter. When objects are dumped to the FileSystem, they are wrapped in an extra dictionary which stores the expiration time of the object:
+The JsonCache is essentially a FileSystemJsonBackend with an additional *timeout* parameter. When objects are dumped to the FileSystem, they are wrapped in an extra dictionary which stores the expiration time of the object. When the object is retrieved it is unpacked, the expiration time is tested and, if the object is still valid, the object is returned.
 
 When an object is retrieved from the cache one of the following happens:
 
