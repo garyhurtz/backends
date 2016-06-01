@@ -2,7 +2,7 @@
 from S3BaseBackend import S3BaseBackend
 from boto.exception import S3ResponseError
 from boto.s3.key import Key
-import StringIO
+from io import StringIO
 import gzip
 
 
@@ -41,7 +41,7 @@ class S3RawBackend(S3BaseBackend):
         else:
             return data
 
-    def dump(self, key, fp, public=False, mimetype=None, cache=False):
+    def dump(self, key, fp_or_str, public=False, mimetype=None, cache=False):
         """
         Dump the uploaded file to S3
 
@@ -49,7 +49,7 @@ class S3RawBackend(S3BaseBackend):
 
         by default the file will be private, set public to make public
         :param key: the key to store the object under
-        :param fp: filepointer
+        :param fp_or_str: file pointer or string
         :param public: whether the object should me made public
         :param mimetype: force the mimetype
         :param cache: cache-control header
@@ -63,11 +63,18 @@ class S3RawBackend(S3BaseBackend):
         # set file permissions
         policy = u'public-read' if public else None
 
+        # get the contents to store
+        content = fp_or_str
+
+        # if it is a filepoint, read the content
+        if isinstance(content, file):
+            content = content.read()
+
         try:
 
             # if mimetype not forced get from fp
-            if mimetype is None and hasattr(fp, u'content_type'):
-                mimetype = fp.content_type
+            if mimetype is None and hasattr(fp_or_str, u'content_type'):
+                mimetype = fp_or_str.content_type
 
             headers[u'Content-Type'] = mimetype
 
@@ -79,16 +86,16 @@ class S3RawBackend(S3BaseBackend):
                 print u'compressing ', key
                 headers[u'Content-Encoding'] = u'gzip'
 
-                sio = StringIO.StringIO()
+                sio = StringIO()
                 gzf = gzip.GzipFile(fileobj=sio, mode='wb')
-                gzf.write(fp.read())
+                gzf.write(content)
                 gzf.close()
 
                 # Output gzipped stream.
                 content = sio.getvalue()
 
-            else:
-                content = fp.read()
+            # else:
+            #     content = fp.read()
 
             k.set_contents_from_string(content, headers=headers, policy=policy)
 

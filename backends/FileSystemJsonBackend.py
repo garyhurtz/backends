@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*- #
 
 from FileSystemBaseBackend import FileSystemBaseBackend
-from flask import json
+import json
 import os
 import errno
 
