@@ -37,7 +37,7 @@ class RawBackendTests(BackendTests):
         """
         self.assertIsInstance(self.dut.load(u'test'), basestring)
 
-    def test_dump(self):
+    def test_dump_fp(self):
         """
         Store a value in the backend
         """
@@ -45,6 +45,26 @@ class RawBackendTests(BackendTests):
 
         with open(u'main.css', u'r') as infile:
             self.assertTrue(self.dut.dump(u'test2', infile))
+
+        self.assertEqual(1, len(self.dut) - before)
+
+    def test_dump_ascii_string(self):
+        """
+        Store a value in the backend
+        """
+        before = len(self.dut)
+
+        self.assertTrue(self.dut.dump(u'test2', u'this is a test string'))
+
+        self.assertEqual(1, len(self.dut) - before)
+
+    def test_dump_unicode_string(self):
+        """
+        Store a value in the backend
+        """
+        before = len(self.dut)
+
+        self.assertTrue(self.dut.dump(u'test2', u'中文'))
 
         self.assertEqual(1, len(self.dut) - before)
 

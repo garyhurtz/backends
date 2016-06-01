@@ -42,7 +42,7 @@ class FileSystemBaseBackend(BaseBackend):
         # key = key.replace(os.sep, u'{0}{0}'.format(os.sep))
 
         # return the path to the object stored under key
-        return unicode(os.path.join(self._path, key))
+        return os.path.join(self._path, key)
 
     def keys(self):
         """
@@ -54,6 +54,8 @@ class FileSystemBaseBackend(BaseBackend):
         """
 
         if self._keys is None:
+
+            # os.listdir is a fs entry point, so need to handle encoding
             self._keys = {f for f in os.listdir(self._path) if os.path.isfile(self.path(f))}
 
         return self._keys

@@ -1,50 +1,12 @@
 # -*- coding: UTF-8 -*- #
 from tests.BackendTests import BackendTests
 import unittest
-__author__ = 'gary'
+__author__ = u'gary'
 
 
-class JsonBackendTestsEN(BackendTests):
+class JsonBackendTests(BackendTests):
 
-    def test_contains(self):
-        """
-        Return True if key is in the backend, else False
-        :param key:
-        :return:
-        """
-        self.assertTrue(u'test' in self.dut)
-
-    @unittest.expectedFailure
-    def test_keys(self):
-        """
-        Dict-like retrieval of all keys in the backend
-        """
-        self.assertTrue(u'test' in self.dut.keys())
-
-    def test_load(self):
-        """
-        Retrieve a value from the backend
-        """
-        self.assertIsInstance(self.dut.load(u'test'), dict)
-
-    def test_dump(self):
-        """
-        Store a value in the backend
-        """
-        before = len(self.dut)
-        self.assertTrue(self.dut.dump(u'test2', {u'b': 2}))
-        self.assertEqual(1, len(self.dut) - before)
-
-    def test_delete(self):
-        """
-        Delete a value from the backend
-        """
-        before = len(self.dut)
-        self.assertTrue(self.dut.delete(u'test'))
-        self.assertEqual(1, before - len(self.dut))
-
-
-class JsonBackendTestsZH(BackendTests):
+    key = None
 
     def test_contains(self):
         """
@@ -52,27 +14,27 @@ class JsonBackendTestsZH(BackendTests):
         :param key:
         :return:
         """
-        self.assertTrue(u'中' in self.dut)
+        self.assertTrue(self.key in self.dut)
 
     @unittest.expectedFailure
     def test_keys(self):
         """
         Dict-like retrieval of all keys in the backend
         """
-        self.assertTrue(u'中' in self.dut.keys())
+        self.assertTrue(self.key in self.dut.keys())
 
     def test_load(self):
         """
         Retrieve a value from the backend
         """
-        self.assertIsInstance(self.dut.load(u'中'), dict)
+        self.assertIsInstance(self.dut.load(self.key), dict)
 
     def test_dump(self):
         """
         Store a value in the backend
         """
         before = len(self.dut)
-        self.assertTrue(self.dut.dump(u'中2', {u'b': 2}))
+        self.assertTrue(self.dut.dump(self.key + u'2', {u'b': 2}))
         self.assertEqual(1, len(self.dut) - before)
 
     def test_delete(self):
@@ -80,5 +42,5 @@ class JsonBackendTestsZH(BackendTests):
         Delete a value from the backend
         """
         before = len(self.dut)
-        self.assertTrue(self.dut.delete(u'中'))
+        self.assertTrue(self.dut.delete(self.key))
         self.assertEqual(1, before - len(self.dut))
