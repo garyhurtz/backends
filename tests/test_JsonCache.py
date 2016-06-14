@@ -5,11 +5,7 @@ from backends.JsonCache import JsonCache
 from tests import cachepath
 
 
-class TestJsonCache(unittest.TestCase):
-
-    def setUp(self):
-        self.dut = JsonCache(cachepath)
-        self.dut.clear()
+class JsonCacheTests(object):
 
     def test_get_en(self):
         value = {u'key': u'value'}
@@ -71,67 +67,7 @@ class TestJsonCache(unittest.TestCase):
         self.assertEqual(0, len(self.dut))
 
 
-class TestJsonCacheDisabled(unittest.TestCase):
-
-    def setUp(self):
-        self.dut = JsonCache()
-        self.dut.clear()
-
-    def test_get_en(self):
-        value = {u'key': u'value'}
-        self.dut.set(u'test', value)
-        self.assertIsNone(self.dut.get(u'test'))
-
-    def test_get_zh(self):
-        value = {u'这': u'个'}
-        self.dut.set(u'考', value)
-        self.assertIsNone(self.dut.get(u'考'))
-
-    def test_set(self):
-        len_before = len(self.dut.keys())
-        self.dut.set(u'test2', {u'key': u'value'})
-        self.assertEqual(0, len(self.dut.keys()) - len_before)
-
-    def test_keys(self):
-        self.dut.set(u'test', {u'key': u'value'})
-        self.dut.set(u'考', {u'这': u'个'})
-
-        keys = self.dut.keys()
-
-        self.assertTrue(isinstance(keys, set))
-        self.assertEqual(0, len(keys))
-
-    def test_items(self):
-        self.dut.set(u'test', {u'key': u'value'})
-        self.dut.set(u'考', {u'这': u'个'})
-        self.assertEqual(0, len(list(self.dut.items())))
-
-    def test_contains_en(self):
-        self.dut.set(u'test', {u'key': u'value'})
-        self.assertFalse(u'test' in self.dut)
-
-    def test_contains_zh(self):
-        self.dut.set(u'考', {u'这': u'个'})
-        self.assertFalse(u'考' in self.dut)
-
-    def test_len(self):
-        self.dut.set(u'test', {u'key': u'value'})
-        self.dut.set(u'考', {u'这': u'个'})
-        self.assertEqual(0, len(self.dut))
-
-    def test_clear(self):
-        self.dut.set(u'test', {u'key': u'value'})
-        self.dut.set(u'考', {u'这': u'个'})
-        self.assertEqual(0, len(self.dut))
-        self.dut.clear()
-        self.assertEqual(0, len(self.dut))
-
-
-class TestJsonCacheNested(unittest.TestCase):
-
-    def setUp(self):
-        self.dut = JsonCache(cachepath)
-        self.dut.clear()
+class JsonCacheNestedTests(object):
 
     def test_get_en(self):
         value = {u'key': u'value'}
@@ -191,3 +127,31 @@ class TestJsonCacheNested(unittest.TestCase):
         self.assertEqual(2, len(self.dut))
         self.dut.clear()
         self.assertEqual(0, len(self.dut))
+
+
+class TestJsonCache(JsonCacheTests, unittest.TestCase):
+
+    def setUp(self):
+        self.dut = JsonCache(cachepath)
+        self.dut.clear()
+
+
+class TestJsonCacheVolatile(JsonCacheTests, unittest.TestCase):
+
+    def setUp(self):
+        self.dut = JsonCache()
+        self.dut.clear()
+
+
+class TestJsonCacheNested(JsonCacheNestedTests, unittest.TestCase):
+
+    def setUp(self):
+        self.dut = JsonCache(cachepath)
+        self.dut.clear()
+
+
+class TestJsonCacheNestedVolatile(JsonCacheNestedTests, unittest.TestCase):
+
+    def setUp(self):
+        self.dut = JsonCache()
+        self.dut.clear()
