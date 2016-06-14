@@ -34,17 +34,17 @@ class FileSystemJsonBackend(FileSystemBaseBackend):
             # ValueError is a superclass of JSONDecodeError and may catch other errors too
             # Raised if something is wrong with the JSON
             self.delete(key)
-            print e, key
+            # print e, key
             return None
 
         except IOError as e:
             # Raised if the file cant be opened
-            print e, key
+            # print e, key
             return None
 
         except OSError as e:
             # Raised if there is an OS-related error
-            print e, key
+            # print e, key
             return None
 
         else:

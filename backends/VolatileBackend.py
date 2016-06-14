@@ -26,3 +26,6 @@ class VolatileBackend(BaseBackend):
 
     def delete(self, key):
         return self.data.pop(key)
+
+    def clear(self):
+        return self.data.clear()

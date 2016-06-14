@@ -43,6 +43,19 @@ class BaseBackend(object):
         """
         return ((key, self.load(key)) for key in self.keys())
 
+    def clear(self):
+        """
+        Generic clear method.
+
+        Override when better implementations are available.
+
+        :return:
+        """
+        keys = [k for k in self.keys()]
+
+        for k in keys:
+            self.delete(k)
+
     @abc.abstractmethod
     def keys(self):
         """

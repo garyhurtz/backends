@@ -13,6 +13,4 @@ class TestS3RawBackend(unittest.TestCase, RawBackendTests):
             self.dut.dump(u'test', infile)
 
     def tearDown(self):
-        # make a copy of the key set to avoid changes while iterating
-        for key in [key for key in self.dut]:
-            self.dut.delete(key)
+        self.dut.clear()

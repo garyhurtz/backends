@@ -18,7 +18,7 @@ class JsonCache(object):
 
     def __init__(self, path=None, timeout=300):
 
-        assert isinstance(timeout, int), u'timeout must be an integer'
+        assert isinstance(timeout, int), u'timeout must be an integer, not {0}'.format(type(timeout))
 
         self._timeout = timeout
 
@@ -27,9 +27,11 @@ class JsonCache(object):
         self.locals = {}
 
         if path is None:
+            self.enabled = False
             self.backend = VolatileBackend()
 
         else:
+            self.enabled = True
             self.backend = FileSystemJsonBackend(path)
 
     def __iter__(self):
@@ -53,6 +55,9 @@ class JsonCache(object):
 
         If expired or doesnt exist return None, else return item
         """
+
+        if not self.enabled:
+            return None
 
         # if the item is already cached, return it
         if key not in self.locals:
@@ -82,6 +87,9 @@ class JsonCache(object):
 
         assert isinstance(value, dict) or isinstance(value, list), u'Value must be JSON serializable'
 
+        if not self.enabled:
+            return
+
         # set the local cache
         self.locals[key] = value
 
@@ -92,6 +100,9 @@ class JsonCache(object):
         self.backend.dump(key, serialized)
 
     def delete(self, key):
+
+        if not self.enabled:
+            return
 
         if key in self.locals:
             del self.locals[key]
