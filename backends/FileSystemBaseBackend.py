@@ -81,12 +81,17 @@ class FileSystemBaseBackend(BaseBackend):
 
         except IOError as e:
             # item does not exist in the cache
-            print e
+            # print e
             return True
 
         except OSError as e:
             # another error occurred
-            print e
+            # print e
+            return False
+
+        except KeyError as e:
+            # access a file that doesnt exist
+            # print e
             return False
 
         else:

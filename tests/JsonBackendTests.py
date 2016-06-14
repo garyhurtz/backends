@@ -44,3 +44,7 @@ class JsonBackendTests(BackendTests):
         before = len(self.dut)
         self.assertTrue(self.dut.delete(self.key))
         self.assertEqual(1, before - len(self.dut))
+
+    def test_clear(self):
+        self.dut.clear()
+        self.assertEqual(len(self.dut), 0)
